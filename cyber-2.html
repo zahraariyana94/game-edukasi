@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Matrix & Tech Workshop - Game Matematika SMK Kelas 11</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome CDN for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Orbitron & Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        cyber: {
+                            dark: '#0f172a',
+                            panel: '#1e293b',
+                            accent: '#06b6d4',
+                            neon: '#10b981',
+                            pink: '#ec4899',
+                            gold: '#f59e0b',
+                            purple: '#8b5cf6'
+                        }
+                    },
+                    animation: {
+                        'pulse-glow': 'pulseGlow 2s infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        pulseGlow: {
+                            '0%, 100%': { boxShadow: '0 0 15px rgba(6, 182, 212, 0.4)' },
+                            '50%': { boxShadow: '0 0 25px rgba(6, 182, 212, 0.8)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-6px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #090d16;
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(236, 72, 153, 0.08) 0%, transparent 40%);
+        }
+        .cyber-border {
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.15);
+        }
+        .cyber-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+            backdrop-filter: blur(8px);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #06b6d4;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen font-sans flex flex-col justify-between overflow-x-hidden antialiased select-none">
+
+    <!-- Header / Navbar -->
+    <header class="w-full bg-slate-900/80 border-b border-cyan-500/30 backdrop-blur-md sticky top-0 z-50 px-4 py-3">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-cyan-500 to-emerald-400 flex items-center justify-center text-slate-950 font-orbitron font-bold text-xl shadow-lg shadow-cyan-500/20">
+                    <i class="fa-solid fa-microchip"></i>
+                </div>
+                <div>
+                    <h1 class="font-orbitron font-extrabold text-lg md:text-xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400">
+                        CYBER MATRIX <span class="text-xs text-cyan-400/80 border border-cyan-500/40 px-1.5 py-0.5 rounded font-sans ml-1">SMK KELAS 11</span>
+                    </h1>
+                    <p class="text-xs text-slate-400 hidden sm:block">Tech Workshop & Financial Cyber Simulator</p>
+                </div>
+            </div>
+
+            <!-- Audio & Info Toggle -->
+            <div class="flex items-center gap-3">
+                <button id="btn-sound" onclick="toggleSound()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-sm transition flex items-center gap-2">
+                    <i id="sound-icon" class="fa-solid fa-volume-high text-cyan-400"></i>
+                    <span class="hidden md:inline text-xs">Suara: ON</span>
+                </button>
+                <button onclick="openModal('guide-modal')" class="px-3 py-1.5 rounded-lg bg-cyan-950/60 hover:bg-cyan-900/80 border border-cyan-500/40 text-cyan-300 text-sm transition flex items-center gap-2">
+                    <i class="fa-solid fa-circle-question"></i>
+                    <span class="hidden md:inline text-xs">Panduan</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-6xl mx-auto w-full p-4 my-auto flex-grow flex flex-col justify-center">
+
+        <!-- SCREEN 1: START / MENU UTAMA -->
+        <div id="screen-start" class="cyber-card rounded-2xl p-6 md:p-10 cyber-border max-w-3xl mx-auto w-full text-center relative overflow-hidden my-6">
+            <div class="absolute -top-12 -right-12 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-12 -left-12 w-40 h-40 bg-pink-500/10 rounded-full blur-3xl"></div>
+
+            <div class="inline-block px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-semibold uppercase tracking-wider mb-4 animate-float">
+                <i class="fa-solid fa-bolt mr-1"></i> Simulator Tantangan Matematika Terapan
+            </div>
+
+            <h2 class="font-orbitron text-2xl md:text-4xl font-black text-white mb-3">
+                SELAMAT DATANG, <span class="text-cyan-400">CYBER TECHNICIAN!</span>
+            </h2>
+            <p class="text-slate-300 text-sm md:text-base max-w-xl mx-auto mb-8 leading-relaxed">
+                Bantu bengkel teknologi digital menyelesaikan pembacaan data matriks piksel, analisis sistem mesin pabrik (komposisi fungsi), dan kalkulasi investasi keuangan usaha SMK!
+            </p>
+
+            <!-- Mode/Materi Selection -->
+            <div class="mb-8 text-left max-w-lg mx-auto">
+                <label class="block text-xs font-orbitron font-bold text-cyan-400 uppercase mb-2">Pilih Modul Tantangan:</label>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <button type="button" onclick="selectTopic('matriks')" id="topic-matriks" class="topic-btn active border-2 border-cyan-500 bg-cyan-950/40 text-cyan-300 p-3 rounded-xl text-xs font-bold text-center transition flex flex-col items-center gap-2">
+                        <i class="fa-solid fa-border-all text-xl"></i>
+                        <span>Operasi Matriks</span>
+                    </button>
+                    <button type="button" onclick="selectTopic('fungsi')" id="topic-fungsi" class="topic-btn border border-slate-700 bg-slate-800/60 text-slate-400 p-3 rounded-xl text-xs font-bold text-center transition flex flex-col items-center gap-2">
+                        <i class="fa-solid fa-diagram-project text-xl"></i>
+                        <span>Komposisi Fungsi</span>
+                    </button>
+                    <button type="button" onclick="selectTopic('keuangan')" id="topic-keuangan" class="topic-btn border border-slate-700 bg-slate-800/60 text-slate-400 p-3 rounded-xl text-xs font-bold text-center transition flex flex-col items-center gap-2">
+                        <i class="fa-solid fa-coins text-xl"></i>
+                        <span>Bunga & Anuitas</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Difficulties -->
+            <div class="mb-8 text-left max-w-lg mx-auto">
+                <label class="block text-xs font-orbitron font-bold text-cyan-400 uppercase mb-2">Tingkat Kesulitan System:</label>
+                <div class="grid grid-cols-3 gap-3">
+                    <button onclick="selectDiff('easy')" id="diff-easy" class="diff-btn active bg-emerald-950/60 border-2 border-emerald-500 text-emerald-300 py-2.5 rounded-xl text-xs font-bold text-center transition">
+                        EASY (120s)
+                    </button>
+                    <button onclick="selectDiff('medium')" id="diff-medium" class="diff-btn bg-slate-800/60 border border-slate-700 text-slate-400 py-2.5 rounded-xl text-xs font-bold text-center transition">
+                        MEDIUM (90s)
+                    </button>
+                    <button onclick="selectDiff('hard')" id="diff-hard" class="diff-btn bg-slate-800/60 border border-slate-700 text-slate-400 py-2.5 rounded-xl text-xs font-bold text-center transition">
+                        HARD (60s)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Start Button -->
+            <button onclick="startGame()" class="w-full max-w-md py-4 px-8 rounded-xl font-orbitron font-bold text-slate-950 bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 transform hover:-translate-y-0.5 active:translate-y-0 shadow-lg shadow-cyan-500/30 transition text-base tracking-wider uppercase">
+                <i class="fa-solid fa-play mr-2"></i> Mulai Misi Cyber
+            </button>
+        </div>
+
+        <!-- SCREEN 2: GAMEPLAY INTERACTION -->
+        <div id="screen-game" class="hidden flex-col gap-4 max-w-4xl mx-auto w-full my-4">
+            
+            <!-- Dashboard Bar: Score, Timer, Streak -->
+            <div class="grid grid-cols-3 gap-3">
+                <!-- Score -->
+                <div class="cyber-card p-3 md:p-4 rounded-xl cyber-border flex items-center justify-between">
+                    <div>
+                        <div class="text-[10px] md:text-xs font-orbitron text-slate-400 uppercase">Skor Saat Ini</div>
+                        <div id="game-score" class="font-orbitron font-black text-xl md:text-2xl text-cyan-400">0</div>
+                    </div>
+                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-cyan-950 flex items-center justify-center text-cyan-400 text-base md:text-lg">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                </div>
+
+                <!-- Timer -->
+                <div class="cyber-card p-3 md:p-4 rounded-xl cyber-border flex items-center justify-between">
+                    <div>
+                        <div class="text-[10px] md:text-xs font-orbitron text-slate-400 uppercase">Sisa Waktu</div>
+                        <div id="game-timer" class="font-orbitron font-black text-xl md:text-2xl text-emerald-400">120s</div>
+                    </div>
+                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-emerald-950 flex items-center justify-center text-emerald-400 text-base md:text-lg">
+                        <i class="fa-solid fa-stopwatch"></i>
+                    </div>
+                </div>
+
+                <!-- Combo / Streak -->
+                <div class="cyber-card p-3 md:p-4 rounded-xl cyber-border flex items-center justify-between">
+                    <div>
+                        <div class="text-[10px] md:text-xs font-orbitron text-slate-400 uppercase">Combo Streak</div>
+                        <div id="game-streak" class="font-orbitron font-black text-xl md:text-2xl text-pink-500">x0</div>
+                    </div>
+                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-pink-950 flex items-center justify-center text-pink-400 text-base md:text-lg">
+                        <i class="fa-solid fa-fire-flame-curved"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Problem Card Area -->
+            <div class="cyber-card rounded-2xl p-5 md:p-8 cyber-border relative flex flex-col justify-between min-h-[380px]">
+                
+                <!-- Badge Topic & Q Number -->
+                <div class="flex justify-between items-center pb-4 mb-4 border-b border-slate-800">
+                    <span id="q-topic-badge" class="px-3 py-1 rounded-full text-xs font-orbitron font-semibold bg-cyan-950 text-cyan-400 border border-cyan-500/40">
+                        MATRIKS - LEVEL EASY
+                    </span>
+                    <span id="q-number" class="text-xs font-orbitron text-slate-400">Tantangan #1</span>
+                </div>
+
+                <!-- Scenario & Math Display -->
+                <div class="my-auto">
+                    <!-- Contextual SMK Scenario -->
+                    <div id="q-scenario" class="text-slate-300 text-xs md:text-sm mb-4 leading-relaxed bg-slate-900/60 p-3 rounded-lg border border-slate-800">
+                        [Skenario Dunia Kerja SMK]
+                    </div>
+
+                    <!-- Main Math Question Container -->
+                    <div id="q-math-container" class="text-center py-4 text-slate-100">
+                        <!-- Mathematical equations or matrix tables rendered here dynamically -->
+                    </div>
+                </div>
+
+                <!-- Hint Container -->
+                <div id="hint-box" class="hidden mb-4 p-3 bg-amber-950/40 border border-amber-500/40 rounded-xl text-amber-200 text-xs animate-pulse">
+                    <i class="fa-solid fa-lightbulb text-amber-400 mr-2"></i> <span id="hint-text"></span>
+                </div>
+
+                <!-- Action Toolbar & Multiple Choice Options -->
+                <div class="mt-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <button onclick="toggleHint()" class="text-xs text-amber-400 hover:text-amber-300 flex items-center gap-1 font-semibold transition">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Minta Petunjuk Hint (-5 Poin)
+                        </button>
+                    </div>
+
+                    <!-- Option Buttons Grid -->
+                    <div id="options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <!-- Dynamic Buttons -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: GAME OVER / EVALUASI -->
+        <div id="screen-result" class="hidden cyber-card rounded-2xl p-6 md:p-10 cyber-border max-w-2xl mx-auto w-full text-center relative my-6">
+            <div class="w-20 h-20 rounded-2xl bg-gradient-to-tr from-cyan-500 to-emerald-400 mx-auto flex items-center justify-center text-slate-950 font-orbitron font-black text-4xl shadow-xl shadow-cyan-500/30 mb-4">
+                <i class="fa-solid fa-award"></i>
+            </div>
+            
+            <h2 class="font-orbitron text-2xl md:text-3xl font-bold text-white mb-2">MISI SIMULASI SELESAI</h2>
+            <p id="result-status-text" class="text-cyan-400 font-semibold text-sm mb-6">Performa Teknisi: Sangat Baik!</p>
+
+            <!-- Final Stats Grid -->
+            <div class="grid grid-cols-3 gap-3 mb-6">
+                <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                    <div class="text-[10px] font-orbitron text-slate-400">TOTAL SKOR</div>
+                    <div id="res-score" class="text-xl md:text-2xl font-orbitron font-bold text-cyan-400">0</div>
+                </div>
+                <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                    <div class="text-[10px] font-orbitron text-slate-400">AKURASI BENAR</div>
+                    <div id="res-accuracy" class="text-xl md:text-2xl font-orbitron font-bold text-emerald-400">0%</div>
+                </div>
+                <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                    <div class="text-[10px] font-orbitron text-slate-400">COMBO TERTINGGI</div>
+                    <div id="res-streak" class="text-xl md:text-2xl font-orbitron font-bold text-pink-500">x0</div>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                <button onclick="startGame()" class="py-3 px-6 rounded-xl font-orbitron font-bold text-slate-950 bg-gradient-to-r from-cyan-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 transition text-sm uppercase">
+                    <i class="fa-solid fa-rotate-right mr-2"></i> Coba Lagi
+                </button>
+                <button onclick="showScreen('start')" class="py-3 px-6 rounded-xl font-orbitron font-bold text-slate-200 bg-slate-800 hover:bg-slate-700 border border-slate-700 transition text-sm uppercase">
+                    <i class="fa-solid fa-house mr-2"></i> Menu Utama
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal Pembahasan Jawaban (Feedback Modal) -->
+    <div id="explanation-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="cyber-card rounded-2xl max-w-lg w-full p-6 cyber-border relative max-h-[90vh] flex flex-col justify-between">
+            <div>
+                <div id="modal-status-badge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-orbitron font-bold mb-3">
+                    <!-- Dynamic status (Salah/Benar) -->
+                </div>
+                <h3 class="font-orbitron text-lg font-bold text-white mb-2" id="modal-title">Pembahasan Solusi</h3>
+                
+                <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 text-slate-300 text-xs md:text-sm space-y-3 overflow-y-auto max-h-[50vh]" id="modal-body">
+                    <!-- Dynamic explanation content -->
+                </div>
+            </div>
+
+            <div class="mt-5 pt-3 border-t border-slate-800 text-right">
+                <button onclick="closeExplanationModal()" class="w-full py-2.5 rounded-xl font-orbitron font-bold text-slate-950 bg-cyan-400 hover:bg-cyan-300 text-xs uppercase transition">
+                    Lanjutkan Misi <i class="fa-solid fa-arrow-right ml-1"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Panduan / Guide -->
+    <div id="guide-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="cyber-card rounded-2xl max-w-md w-full p-6 cyber-border relative">
+            <h3 class="font-orbitron text-lg font-bold text-cyan-400 mb-3 flex items-center gap-2">
+                <i class="fa-solid fa-book-open"></i> Panduan Cyber Workshop
+            </h3>
+            <div class="text-slate-300 text-xs leading-relaxed space-y-2 mb-5">
+                <p><strong class="text-white">1. Tema Matriks:</strong> Digunakan untuk pemrosesan citra digital, transformasi piksel, dan persediaan inventaris barang bengkel.</p>
+                <p><strong class="text-white">2. Komposisi Fungsi:</strong> Pemrosesan berantai pada mesin produksi industri SMK dan konversi sinyal sensor.</p>
+                <p><strong class="text-white">3. Bunga & Anuitas:</strong> Perhitungan kalkulasi modal bisnis, cicilan alat produksi, dan investasi usaha digital.</p>
+                <p><strong class="text-white">4. Sistem Combo:</strong> Menjawab benar secara berturut-turut memberikan pengali bonus skor!</p>
+            </div>
+            <button onclick="closeModal('guide-modal')" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-orbitron font-bold text-xs rounded-lg border border-slate-700">
+                Mengerti
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="w-full text-center py-3 text-[11px] text-slate-500 border-t border-slate-800/80 bg-slate-950/40">
+        Cyber Matrix & Tech Workshop &copy; 2026 - Media Pembelajaran Matematika Interaktif SMK Kelas 11
+    </footer>
+
+    <!-- JavaScript Game Logic -->
+    <script>
+        /* ==========================================================================
+           AUDIO SYNTHESIZER (Web Audio API - Standalone without external files)
+           ========================================================================== */
+        let soundEnabled = true;
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new AudioCtx();
+            }
+        }
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            initAudio();
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'correct') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.exponentialRampToValueAtTime(880, now + 0.2); // A5
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, now); // A3
+                osc.frequency.exponentialRampToValueAtTime(110, now + 0.3); // A2
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'click') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, now);
+                gain.gain.setValueAtTime(0.05, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                osc.start(now);
+                osc.stop(now + 0.05);
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const icon = document.getElementById('sound-icon');
+            const btn = document.getElementById('btn-sound');
+            if (soundEnabled) {
+                icon.className = 'fa-solid fa-volume-high text-cyan-400';
+                btn.querySelector('span').innerText = 'Suara: ON';
+            } else {
+                icon.className = 'fa-solid fa-volume-xmark text-slate-500';
+                btn.querySelector('span').innerText = 'Suara: OFF';
+            }
+        }
+
+        /* ==========================================================================
+           GAME STATE & DATA QUESTION BANK (SMK KELAS 11)
+           ========================================================================== */
+        let selectedTopic = 'matriks'; // 'matriks', 'fungsi', 'keuangan'
+        let selectedDifficulty = 'easy'; // 'easy', 'medium', 'hard'
+        let score = 0;
+        let streak = 0;
+        let maxStreak = 0;
+        let correctAnswersCount = 0;
+        let totalQuestionsAnswered = 0;
+        let timer = 120;
+        let timerInterval = null;
+        let currentQuestion = null;
+        let questionIndex = 0;
+
+        // Bank Soal Terstruktur untuk SMK Kelas 11
+        const questionBank = {
+            matriks: [
+                {
+                    scenario: "Sebuah studio animasi SMK Multimedia mencatat jumlah render frame piksel pada dua server (Server A dan B). Matriks A mewakili batch 1 dan Matriks B mewakili batch 2.",
+                    mathDisplay: `
+                        <div class="flex flex-wrap justify-center items-center gap-4 font-orbitron text-sm md:text-base">
+                            <div>A = <span class="inline-block border-l-2 border-r-2 border-cyan-400 px-2 py-1">[ 3 &nbsp; 5 ]<br>[ 1 &nbsp; 2 ]</span></div>
+                            <div class="text-xl">+</div>
+                            <div>B = <span class="inline-block border-l-2 border-r-2 border-cyan-400 px-2 py-1">[ 4 &nbsp; -1 ]<br>[ 2 &nbsp; 6 ]</span></div>
+                        </div>
+                        <p class="mt-3 text-xs md:text-sm text-cyan-300">Tentukan nilai elemen pada baris ke-1 kolom ke-2 dari hasil (A + B)!</p>
+                    `,
+                    options: ["4", "8", "3", "7"],
+                    correct: 0, // 5 + (-1) = 4
+                    hint: "Penjumlahan matriks dilakukan dengan menjumlahkan elemen yang seletak. Untuk baris 1 kolom 2: 5 + (-1).",
+                    explanation: "Baris 1 Kolom 2 dari A adalah 5, dan dari B adalah -1.<br>Maka elemen hasil = 5 + (-1) = 4."
+                },
+                {
+                    scenario: "Teknisi Komputer SMK meriset memori GPU. Dilakukan perkalian skalar untuk mengoptimalkan frekuensi memori matriks K.",
+                    mathDisplay: `
+                        <div class="font-orbitron text-sm md:text-base">
+                            K = <span class="inline-block border-l-2 border-r-2 border-cyan-400 px-2 py-1">[ 2 &nbsp; -3 ]<br>[ 4 &nbsp; 1 ]</span>
+                        </div>
+                        <p class="mt-3 text-xs md:text-sm text-cyan-300">Hitung matriks 3K dan tentukan nilai elemen baris ke-2 kolom ke-1!</p>
+                    `,
+                    options: ["12", "-9", "6", "3"],
+                    correct: 0, // 3 * 4 = 12
+                    hint: "Kalikan setiap elemen matriks K dengan konstanta 3.",
+                    explanation: "Elemen baris 2 kolom 1 dari K adalah 4.<br>Hasil perkalian skalar: 3 × 4 = 12."
+                },
+                {
+                    scenario: "Sistem enkripsi data bengkel cyber menggunakan determinan matriks 2x2 sebagai kunci deskripsi enkripsi log data.",
+                    mathDisplay: `
+                        <div class="font-orbitron text-sm md:text-base">
+                            M = <span class="inline-block border-l-2 border-r-2 border-cyan-400 px-2 py-1">[ 5 &nbsp; 2 ]<br>[ 3 &nbsp; 4 ]</span>
+                        </div>
+                        <p class="mt-3 text-xs md:text-sm text-cyan-300">Berapakah nilai determinan dari matriks M (det M)?</p>
+                    `,
+                    options: ["14", "26", "17", "7"],
+                    correct: 0, // (5*4) - (2*3) = 20 - 6 = 14
+                    hint: "Rumus determinan matriks 2x2 [a b; c d] adalah (a·d - b·c).",
+                    explanation: "det(M) = (5 × 4) - (2 × 3) = 20 - 6 = 14."
+                },
+                {
+                    scenario: "Pemrosesan kontrol lengan robot otomotif SMK membutuhkan invers matriks untuk membalik arah koordinat transmisi.",
+                    mathDisplay: `
+                        <div class="font-orbitron text-sm md:text-base">
+                            P = <span class="inline-block border-l-2 border-r-2 border-cyan-400 px-2 py-1">[ 4 &nbsp; 1 ]<br>[ 3 &nbsp; 1 ]</span>
+                        </div>
+                        <p class="mt-3 text-xs md:text-sm text-cyan-300">Tentukan matriks Invers P⁻¹!</p>
+                    `,
+                    options: [
+                        "[ 1  -1 ] / [ -3  4 ]",
+                        "[ 4  -1 ] / [ -3  1 ]",
+                        "[ 1   1 ] / [  3  4 ]",
+                        "[ -1  1 ] / [  3 -4 ]"
+                    ],
+                    correct: 0,
+                    hint: "det(P) = (4)(1) - (1)(3) = 1. Adjoint(P) diputar: tukar elemen diagonal utama, ubah tanda diagonal samping.",
+                    explanation: "det(P) = 4 - 3 = 1.<br>Adjoint(P) = [ 1 -1 ; -3 4 ].<br>P⁻¹ = (1/det) × Adjoint = [ 1 -1 ; -3 4 ]."
+                }
+            ],
+            fungsi: [
+                {
+                    scenario: "Di bengkel manufaktur SMK, mesin A mengolah bahan mentah x dengan fungsi f(x) = 2x + 3. Mesin B mengolah hasilnya dengan g(x) = x - 5.",
+                    mathDisplay: `
+                        <div class="font-orbitron text-sm md:text-base text-cyan-300">
+                            f(x) = 2x + 3 <br>
+                            g(x) = x - 5
+                        </div>
+                        <p class="mt-3 text-xs md:text-sm text-slate-200">Tentukan rumus komposisi fungsi sistem pabrik (g ∘ f)(x)!</p>
+                    `,
+                    options: ["2x - 2", "2x - 8", "3x - 2", "2x + 2"],
+                    correct: 0, // g(f(x)) = (2x+3) - 5 = 2x - 2
+                    hint: "Substitusikan seluruh fungsi f(x) ke dalam variabel x pada fungsi g(x).",
+                    explanation: "(g ∘ f)(x) = g(f(x)) = g(2x + 3) = (2x + 3) - 5 = 2x - 2."
+                },
+                {
+                    scenario: "Sebuah sensor suhu IoT mengirimkan data x yang dikonversi oleh fungsi f(x) = 3x - 4. Komputer membaca nilai akhir f(x) = 11.",
+                    mathDisplay: `
+                        <div class="font-orbitron text-sm md:text-base text-cyan-300">
+                            f(x) = 3x - 4
+                        </div>
+                        <p class="mt-3 text-xs md:text-sm text-slate-200">Gunakan fungsi invers f⁻¹(11) untuk menemukan masukan suhu asal x!</p>
+                    `,
+                    options: ["5", "4", "6", "3"],
+                    correct: 0, // (11 + 4)/3 = 5
+                    hint: "Untuk f(x) = y, maka f⁻¹(y) = (y + 4) / 3. Masukkan y = 11.",
+                    explanation: "3x - 4 = 11  =>  3x = 15  =>  x = 5."
+                },
+                {
+                    scenario: "Unit Pemrosesan Server Mikrotik SMK mengkalkulasi kuota data dengan dua tahap: f(x) = x + 4 dan g(x) = 3x.",
+                    mathDisplay: `
+                        <div class="font-orbitron text-sm md:text-base text-cyan-300">
+                            f(x) = x + 4 <br> g(x) = 3x
+                        </div>
+                        <p class="mt-3 text-xs md:text-sm text-slate-200">Hitung nilai dari (f ∘ g)(2)!</p>
+                    `,
+                    options: ["10", "18", "14", "12"],
+                    correct: 0, // g(2) = 6 -> f(6) = 10
+                    hint: "Hitung dahulu nilai g(2), lalu masukkan hasilnya ke fungsi f.",
+                    explanation: "g(2) = 3(2) = 6.<br>Maka (f ∘ g)(2) = f(6) = 6 + 4 = 10."
+                }
+            ],
+            keuangan: [
+                {
+                    scenario: "Unit Usaha Technopark SMK menyimpan modal usaha sebesar Rp 2.000.000 di bank dengan suku bunga majemuk 10% per tahun.",
+                    mathDisplay: `
+                        <div class="font-orbitron text-sm md:text-base text-cyan-300">
+                            Modal (M₀) = Rp 2.000.000 <br> Bunga (i) = 10% / tahun <br> Waktu (n) = 2 tahun
+                        </div>
+                        <p class="mt-3 text-xs md:text-sm text-slate-200">Hitung total modal akhir M₂ dengan rumus Mₙ = M₀(1 + i)ⁿ!</p>
+                    `,
+                    options: ["Rp 2.420.000", "Rp 2.400.000", "Rp 2.200.000", "Rp 2.500.000"],
+                    correct: 0, // 2000000 * (1.1)^2 = 2000000 * 1.21 = 2420000
+                    hint: "M₂ = 2.000.000 × (1 + 0,10)² = 2.000.000 × (1,1)² = 2.000.000 × 1,21.",
+                    explanation: "M₂ = 2.000.000 × (1,10)² = 2.000.000 × 1,21 = Rp 2.420.000."
+                },
+                {
+                    scenario: "Koperasi Siswa SMK memberikan pinjaman barang bengkel dengan suku bunga tunggal 5% per tahun. Seorang siswa meminjam Rp 1.000.000 selama 3 tahun.",
+                    mathDisplay: `
+                        <div class="font-orbitron text-sm md:text-base text-cyan-300">
+                            M₀ = Rp 1.000.000 | i = 5% | t = 3 tahun
+                        </div>
+                        <p class="mt-3 text-xs md:text-sm text-slate-200">Berapa total besar bunga tunggal yang harus dibayar?</p>
+                    `,
+                    options: ["Rp 150.000", "Rp 100.000", "Rp 200.000", "Rp 50.000"],
+                    correct: 0, // 1000000 * 0.05 * 3 = 150000
+                    hint: "Rumus Bunga Tunggal B = M₀ × i × t.",
+                    explanation: "B = 1.000.000 × 0,05 × 3 = Rp 150.000."
+                },
+                {
+                    scenario: "Pembelian mesin bubut CNC seharga Rp 10.000.000 dicicil secara Anuitas bulanan. Jika angsuran pokok bulan pertama Rp 800.000 dan bunganya Rp 200.000.",
+                    mathDisplay: `
+                        <div class="font-orbitron text-sm md:text-base text-cyan-300">
+                            Angsuran (a₁) = Rp 800.000 <br> Bunga (b₁) = Rp 200.000
+                        </div>
+                        <p class="mt-3 text-xs md:text-sm text-slate-200">Berapakah besar nilai Anuitas (A) bulanan tersebut?</p>
+                    `,
+                    options: ["Rp 1.000.000", "Rp 600.000", "Rp 1.200.000", "Rp 800.000"],
+                    correct: 0, // Anuitas = Angsuran + Bunga = 800000 + 200000 = 1000000
+                    hint: "Rumus Anuitas: A = Angsuran (aₙ) + Bunga (bₙ).",
+                    explanation: "Anuitas A = a₁ + b₁ = Rp 800.000 + Rp 200.000 = Rp 1.000.000."
+                }
+            ]
+        };
+
+        /* ==========================================================================
+           UI NAVIGATION & SCREEN MANAGERS
+           ========================================================================== */
+        function showScreen(screenId) {
+            document.getElementById('screen-start').classList.add('hidden');
+            document.getElementById('screen-game').classList.add('hidden');
+            document.getElementById('screen-game').classList.remove('flex');
+            document.getElementById('screen-result').classList.add('hidden');
+
+            if (screenId === 'start') {
+                document.getElementById('screen-start').classList.remove('hidden');
+            } else if (screenId === 'game') {
+                document.getElementById('screen-game').classList.remove('hidden');
+                document.getElementById('screen-game').classList.add('flex');
+            } else if (screenId === 'result') {
+                document.getElementById('screen-result').classList.remove('hidden');
+            }
+        }
+
+        function selectTopic(topic) {
+            playSound('click');
+            selectedTopic = topic;
+            document.querySelectorAll('.topic-btn').forEach(btn => {
+                btn.classList.remove('active', 'border-2', 'border-cyan-500', 'text-cyan-300', 'bg-cyan-950/40');
+                btn.classList.add('border', 'border-slate-700', 'text-slate-400', 'bg-slate-800/60');
+            });
+
+            const activeBtn = document.getElementById(`topic-${topic}`);
+            activeBtn.classList.remove('border-slate-700', 'text-slate-400', 'bg-slate-800/60');
+            activeBtn.classList.add('active', 'border-2', 'border-cyan-500', 'text-cyan-300', 'bg-cyan-950/40');
+        }
+
+        function selectDiff(diff) {
+            playSound('click');
+            selectedDifficulty = diff;
+            document.querySelectorAll('.diff-btn').forEach(btn => {
+                btn.classList.remove('active', 'border-2', 'border-emerald-500', 'border-amber-500', 'border-rose-500', 'text-emerald-300', 'text-amber-300', 'text-rose-300', 'bg-emerald-950/60', 'bg-amber-950/60', 'bg-rose-950/60');
+                btn.classList.add('border', 'border-slate-700', 'text-slate-400', 'bg-slate-800/60');
+            });
+
+            const activeBtn = document.getElementById(`diff-${diff}`);
+            activeBtn.classList.remove('border-slate-700', 'text-slate-400', 'bg-slate-800/60');
+            
+            if (diff === 'easy') {
+                activeBtn.classList.add('active', 'border-2', 'border-emerald-500', 'text-emerald-300', 'bg-emerald-950/60');
+                timer = 120;
+            } else if (diff === 'medium') {
+                activeBtn.classList.add('active', 'border-2', 'border-amber-500', 'text-amber-300', 'bg-amber-950/60');
+                timer = 90;
+            } else if (diff === 'hard') {
+                activeBtn.classList.add('active', 'border-2', 'border-rose-500', 'text-rose-300', 'bg-rose-950/60');
+                timer = 60;
+            }
+        }
+
+        /* ==========================================================================
+           GAME ENGINE & LOGIC
+           ========================================================================== */
+        function startGame() {
+            playSound('click');
+            score = 0;
+            streak = 0;
+            maxStreak = 0;
+            correctAnswersCount = 0;
+            totalQuestionsAnswered = 0;
+            questionIndex = 0;
+
+            // Set initial timer based on diff
+            if (selectedDifficulty === 'easy') timer = 120;
+            else if (selectedDifficulty === 'medium') timer = 90;
+            else if (selectedDifficulty === 'hard') timer = 60;
+
+            updateDashboard();
+            showScreen('game');
+            startTimer();
+            loadNextQuestion();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timer--;
+                document.getElementById('game-timer').innerText = `${timer}s`;
+                
+                if (timer <= 10) {
+                    document.getElementById('game-timer').classList.add('animate-pulse', 'text-rose-500');
+                }
+
+                if (timer <= 0) {
+                    clearInterval(timerInterval);
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function updateDashboard() {
+            document.getElementById('game-score').innerText = score;
+            document.getElementById('game-streak').innerText = `x${streak}`;
+        }
+
+        function loadNextQuestion() {
+            // Hide hint box
+            document.getElementById('hint-box').classList.add('hidden');
+
+            const list = questionBank[selectedTopic];
+            currentQuestion = list[questionIndex % list.length];
+            questionIndex++;
+
+            // Set UI details
+            const topicLabels = {
+                matriks: 'OPERASI MATRIKS',
+                fungsi: 'KOMPOSISI FUNGSI',
+                keuangan: 'MATEMATIKA KEUANGAN'
+            };
+
+            document.getElementById('q-topic-badge').innerText = `${topicLabels[selectedTopic]} - ${selectedDifficulty.toUpperCase()}`;
+            document.getElementById('q-number').innerText = `Tantangan #${questionIndex}`;
+            document.getElementById('q-scenario').innerText = currentQuestion.scenario;
+            document.getElementById('q-math-container').innerHTML = currentQuestion.mathDisplay;
+            document.getElementById('hint-text').innerText = currentQuestion.hint;
+
+            // Render Options
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            
+            currentQuestion.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "cyber-card hover:bg-slate-800/90 border border-slate-700 hover:border-cyan-400/60 p-4 rounded-xl text-left text-xs md:text-sm text-slate-200 transition font-semibold flex items-center justify-between group";
+                btn.onclick = () => checkAnswer(idx);
+                btn.innerHTML = `
+                    <span>${opt}</span>
+                    <i class="fa-solid fa-chevron-right text-slate-600 group-hover:text-cyan-400 group-hover:translate-x-1 transition"></i>
+                `;
+                grid.appendChild(btn);
+            });
+        }
+
+        function toggleHint() {
+            playSound('click');
+            const hintBox = document.getElementById('hint-box');
+            if (hintBox.classList.contains('hidden')) {
+                hintBox.classList.remove('hidden');
+                score = Math.max(0, score - 5);
+                updateDashboard();
+            } else {
+                hintBox.classList.add('hidden');
+            }
+        }
+
+        function checkAnswer(selectedIndex) {
+            totalQuestionsAnswered++;
+            const isCorrect = (selectedIndex === currentQuestion.correct);
+
+            if (isCorrect) {
+                playSound('correct');
+                streak++;
+                if (streak > maxStreak) maxStreak = streak;
+                correctAnswersCount++;
+
+                // Score multiplier logic based on streak
+                const multiplier = streak > 2 ? 1.5 : 1.0;
+                score += Math.round(20 * multiplier);
+
+                showExplanationModal(true);
+            } else {
+                playSound('wrong');
+                streak = 0; // Reset streak
+                showExplanationModal(false);
+            }
+
+            updateDashboard();
+        }
+
+        function showExplanationModal(isCorrect) {
+            const modal = document.getElementById('explanation-modal');
+            const badge = document.getElementById('modal-status-badge');
+            const body = document.getElementById('modal-body');
+
+            if (isCorrect) {
+                badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-orbitron font-bold mb-3 bg-emerald-950 text-emerald-400 border border-emerald-500/40";
+                badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> JAWABAN BENAR! (+${streak > 2 ? 'Bonus Combo' : '20 Poin'})`;
+            } else {
+                badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-orbitron font-bold mb-3 bg-rose-950 text-rose-400 border border-rose-500/40";
+                badge.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> JAWABAN KURANG TEPAT`;
+            }
+
+            body.innerHTML = `
+                <p><strong>Skenario/Soal:</strong> ${currentQuestion.scenario}</p>
+                <div class="my-2 p-2 bg-slate-950 rounded border border-slate-800 text-cyan-300">
+                    <strong>Jawaban Benar:</strong> ${currentQuestion.options[currentQuestion.correct]}
+                </div>
+                <div>
+                    <strong>Pembahasan Matematika SMK:</strong><br>
+                    ${currentQuestion.explanation}
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeExplanationModal() {
+            playSound('click');
+            document.getElementById('explanation-modal').classList.add('hidden');
+            loadNextQuestion();
+        }
+
+        function endGame() {
+            clearInterval(timerInterval);
+            playSound('click');
+
+            const accuracy = totalQuestionsAnswered > 0 
+                ? Math.round((correctAnswersCount / totalQuestionsAnswered) * 100) 
+                : 0;
+
+            document.getElementById('res-score').innerText = score;
+            document.getElementById('res-accuracy').innerText = `${accuracy}%`;
+            document.getElementById('res-streak').innerText = `x${maxStreak}`;
+
+            let statusText = "Performa Teknisi: Perlu Latihan Lagi";
+            if (accuracy >= 80) statusText = "Performa Teknisi: SANGAT HANDAL (EXPERT)";
+            else if (accuracy >= 50) statusText = "Performa Teknisi: CUKUP BAIK (PRO)";
+
+            document.getElementById('result-status-text').innerText = statusText;
+
+            showScreen('result');
+        }
+
+        /* Modal Helpers */
+        function openModal(id) {
+            playSound('click');
+            document.getElementById(id).classList.remove('hidden');
+        }
+        function closeModal(id) {
+            playSound('click');
+            document.getElementById(id).classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
