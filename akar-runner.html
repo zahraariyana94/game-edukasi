@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akar Runner - Cyber Math Challenge</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        .font-pixel {
+            font-family: 'Press Start 2P', monospace;
+        }
+
+        /* Custom canvas container ratio */
+        #game-canvas-container {
+            position: relative;
+            width: 100%;
+            max-width: 960px;
+            aspect-ratio: 16 / 9;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            border-radius: 1rem;
+        }
+
+        /* Glassmorphism modal */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Animated glowing pulse */
+        @keyframes glow-pulse {
+            0%, 100% { filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.6)); }
+            50% { filter: drop-shadow(0 0 20px rgba(236, 72, 153, 0.9)); }
+        }
+
+        .glow-effect {
+            animation: glow-pulse 2s infinite ease-in-out;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.8);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #6366f1;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden relative">
+
+    <!-- Header Navigation -->
+    <header class="w-full max-w-5xl mx-auto px-4 py-3 flex items-center justify-between z-20">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center font-black text-white text-xl shadow-lg shadow-purple-500/30">
+                √
+            </div>
+            <div>
+                <h1 class="text-xl sm:text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400">
+                    AKAR RUNNER
+                </h1>
+                <p class="text-[10px] sm:text-xs text-slate-400 font-semibold tracking-wider">CYBER-MATH ENDLESS CHALLENGE</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <button id="btn-cheatsheet" class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-indigo-500 text-indigo-300 text-xs font-semibold flex items-center gap-2 transition-all active:scale-95 shadow-md">
+                <i class="fa-solid fa-book-open"></i> <span class="hidden sm:inline">Rumus & Sifat</span>
+            </button>
+            <button id="btn-sound" class="p-2 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 text-xs hover:border-pink-500 transition-all active:scale-95 shadow-md">
+                <i id="sound-icon" class="fa-solid fa-volume-high text-sm"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Game Container -->
+    <main class="flex-grow flex items-center justify-center p-2 sm:p-4 z-10">
+        <div id="game-canvas-container" class="rounded-2xl shadow-2xl bg-slate-900 border border-slate-800 overflow-hidden relative">
+            
+            <!-- CANVAS AREA -->
+            <canvas id="gameCanvas" width="960" height="540"></canvas>
+
+            <!-- OVERLAY 1: MAIN MENU -->
+            <div id="menu-overlay" class="absolute inset-0 glass-panel flex flex-col items-center justify-between p-6 sm:p-10 z-30">
+                <div class="text-center space-y-2 mt-4">
+                    <span class="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold border border-indigo-500/30 uppercase tracking-widest">
+                        Game Edukasi Matematika
+                    </span>
+                    <h2 class="text-3xl sm:text-5xl font-black text-white tracking-tight glow-effect">
+                        AKAR RUNNER
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-300 max-w-md mx-auto">
+                        Berlari, hindari rintangan, dan tembus gerbang jawaban yang benar untuk menguasai materi Bentuk Akar!
+                    </p>
+                </div>
+
+                <!-- Input Player Info & Mode -->
+                <div class="w-full max-w-sm space-y-4 my-auto">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Nama Siswa / Pelari</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-user-astronaut absolute left-4 top-1/2 -translate-y-1/2 text-indigo-400"></i>
+                            <input type="text" id="player-name-input" placeholder="Masukkan namamu..." value="AkarMaster" maxlength="15"
+                                class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-950/80 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm font-semibold transition-all">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Pilih Mode Permainan</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button type="button" id="mode-normal" onclick="selectMode('normal')" class="mode-btn py-2.5 px-3 rounded-xl border border-indigo-500 bg-indigo-600/30 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all">
+                                <i class="fa-solid fa-shield-heart text-pink-400"></i> Santai (3 Nyawa)
+                            </button>
+                            <button type="button" id="mode-challenge" onclick="selectMode('challenge')" class="mode-btn py-2.5 px-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-400 font-bold text-xs flex items-center justify-center gap-2 transition-all">
+                                <i class="fa-solid fa-bolt text-amber-400"></i> Tantangan (1 Nyawa)
+                            </button>
+                        </div>
+                    </div>
+
+                    <button id="btn-start-game" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:to-pink-600 text-white font-extrabold text-base shadow-lg shadow-purple-500/30 transition-all active:scale-95 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-play"></i> MULAI BERLARI
+                    </button>
+                </div>
+
+                <!-- Footer controls info -->
+                <div class="text-xs text-slate-400 flex items-center justify-center gap-4 border-t border-slate-800 pt-3 w-full">
+                    <span><i class="fa-solid fa-keyboard text-indigo-400"></i> Gunakan [W / S] atau [Panah Atas / Bawah]</span>
+                </div>
+            </div>
+
+            <!-- OVERLAY 2: GAME HUD (Top Bar overlay) -->
+            <div id="game-hud" class="absolute top-0 left-0 right-0 p-3 sm:p-4 flex items-start justify-between pointer-events-none z-20 hidden">
+                <!-- Left HUD: Lives & Name -->
+                <div class="space-y-1">
+                    <div class="flex items-center gap-2 bg-slate-950/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-800">
+                        <span id="player-lives-display" class="text-base text-pink-500 flex gap-1">
+                            <i class="fa-solid fa-heart"></i>
+                            <i class="fa-solid fa-heart"></i>
+                            <i class="fa-solid fa-heart"></i>
+                        </span>
+                        <span class="text-slate-600 text-xs">|</span>
+                        <span id="hud-player-name" class="text-xs font-bold text-slate-200">AkarMaster</span>
+                    </div>
+                </div>
+
+                <!-- Center HUD: Active Math Problem Display -->
+                <div id="hud-question-box" class="bg-slate-950/90 backdrop-blur-md px-5 py-2 rounded-2xl border-2 border-indigo-500/80 shadow-2xl text-center transform transition-all duration-300">
+                    <span class="text-[10px] text-indigo-400 uppercase tracking-widest font-black block">SOAL BENTUK AKAR</span>
+                    <span id="hud-question-text" class="text-base sm:text-xl font-black text-white font-mono tracking-wide">√48 = ?</span>
+                </div>
+
+                <!-- Right HUD: Score & Combo -->
+                <div class="text-right space-y-1">
+                    <div class="bg-slate-950/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-800 font-mono">
+                        <span class="text-[10px] text-slate-400 block -mb-1">SKOR</span>
+                        <span id="hud-score-display" class="text-lg font-black text-emerald-400">0</span>
+                    </div>
+                    <div id="hud-combo-badge" class="inline-block px-2 py-0.5 rounded-md bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-bold font-mono opacity-0 transition-opacity">
+                        <i class="fa-solid fa-fire"></i> <span id="hud-combo-text">2x Combo</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OVERLAY 3: MOBILE TOUCH CONTROLS -->
+            <div id="mobile-controls" class="absolute bottom-4 right-4 flex flex-col gap-2 z-20 sm:hidden">
+                <button id="btn-touch-up" class="w-14 h-14 rounded-2xl bg-slate-900/80 border border-slate-700 text-indigo-400 text-xl font-bold flex items-center justify-center active:bg-indigo-600 active:text-white shadow-xl">
+                    <i class="fa-solid fa-arrow-up"></i>
+                </button>
+                <button id="btn-touch-down" class="w-14 h-14 rounded-2xl bg-slate-900/80 border border-slate-700 text-indigo-400 text-xl font-bold flex items-center justify-center active:bg-indigo-600 active:text-white shadow-xl">
+                    <i class="fa-solid fa-arrow-down"></i>
+                </button>
+            </div>
+
+            <!-- OVERLAY 4: EDUCATIONAL FEEDBACK TOOLTIP (On Wrong Gate) -->
+            <div id="feedback-tooltip" class="absolute bottom-16 left-1/2 -translate-x-1/2 bg-rose-950/90 border border-rose-500/80 text-rose-200 px-4 py-2.5 rounded-xl shadow-2xl text-xs sm:text-sm font-semibold max-w-md w-11/12 text-center pointer-events-none transition-all duration-300 opacity-0 transform translate-y-4 z-20">
+                <i class="fa-solid fa-triangle-exclamation text-amber-400 mr-1.5"></i>
+                <span id="feedback-text">Salah! √48 = √(16 × 3) = 4√3</span>
+            </div>
+
+            <!-- OVERLAY 5: GAME OVER / RESULT SCREEN -->
+            <div id="gameover-overlay" class="absolute inset-0 glass-panel flex flex-col items-center justify-center p-6 sm:p-8 z-30 hidden">
+                <div class="bg-slate-900/90 border border-slate-800 p-6 sm:p-8 rounded-3xl max-w-lg w-full text-center space-y-5 shadow-2xl relative max-h-[90%] overflow-y-auto">
+                    
+                    <div class="inline-flex p-3 rounded-2xl bg-pink-500/20 text-pink-400 border border-pink-500/30">
+                        <i class="fa-solid fa-flag-checkered text-3xl"></i>
+                    </div>
+
+                    <div>
+                        <h2 class="text-2xl sm:text-3xl font-black text-white">HASIL PERMAINAN</h2>
+                        <p id="result-player-title" class="text-xs text-slate-400 mt-0.5">Hebat, AkarMaster!</p>
+                    </div>
+
+                    <!-- Stats Card Grid -->
+                    <div class="grid grid-cols-3 gap-2 bg-slate-950/80 p-3 rounded-2xl border border-slate-800 font-mono">
+                        <div>
+                            <span class="text-[9px] text-slate-500 uppercase block">Skor Akhir</span>
+                            <span id="result-score" class="text-base sm:text-lg font-bold text-emerald-400">1,400</span>
+                        </div>
+                        <div>
+                            <span class="text-[9px] text-slate-500 uppercase block">Benar / Total</span>
+                            <span id="result-accuracy" class="text-base sm:text-lg font-bold text-indigo-400">12 / 14</span>
+                        </div>
+                        <div>
+                            <span class="text-[9px] text-slate-500 uppercase block">Max Combo</span>
+                            <span id="result-max-combo" class="text-base sm:text-lg font-bold text-amber-400">5x</span>
+                        </div>
+                    </div>
+
+                    <!-- Evaluation Review / Mistakes Review -->
+                    <div class="text-left bg-slate-950/60 p-3.5 rounded-xl border border-slate-800 space-y-2">
+                        <h4 class="text-xs font-bold text-indigo-300 flex items-center justify-between">
+                            <span><i class="fa-solid fa-file-signature"></i> Evaluasi Pembahasan</span>
+                            <span id="result-rating-badge" class="text-[10px] px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Sangat Baik</span>
+                        </h4>
+                        <div id="result-mistakes-list" class="text-xs text-slate-300 space-y-1.5 max-h-32 overflow-y-auto pr-1">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="flex gap-3">
+                        <button id="btn-restart-game" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-pink-500 hover:from-indigo-600 hover:to-pink-600 text-white font-extrabold text-sm shadow-lg shadow-indigo-500/20 transition-all active:scale-95">
+                            <i class="fa-solid fa-rotate-right mr-1"></i> Main Lagi
+                        </button>
+                        <button id="btn-back-menu" class="px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-sm border border-slate-700 transition-all">
+                            Menu
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer Info -->
+    <footer class="w-full text-center py-2 text-[11px] text-slate-500">
+        Akar Runner • Media Pembelajaran Bentuk Akar Interaktif
+    </footer>
+
+    <!-- MODAL CHEATSHEET (RUMUS & SIFAT) -->
+    <div id="cheatsheet-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden">
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl max-w-lg w-full max-h-[85vh] flex flex-col justify-between shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-base font-bold text-indigo-300 flex items-center gap-2">
+                    <i class="fa-solid fa-lightbulb text-amber-400"></i> Panduan & Rumus Bentuk Akar
+                </h3>
+                <button id="btn-close-cheatsheet" class="text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="overflow-y-auto space-y-3 my-3 text-xs text-slate-300 pr-1">
+                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                    <span class="font-bold text-pink-400 block mb-1">1. Simplifikasi (Penyederhanaan)</span>
+                    <p class="text-slate-400 mb-1">Cari perkalian dengan bilangan kuadrat sempurna (4, 9, 16, 25, 36, 49, dst).</p>
+                    <div class="bg-slate-900 p-1.5 rounded font-mono text-center text-indigo-300">
+                        √(a × b) = √a × √b &nbsp;➔&nbsp; √48 = √(16 × 3) = 4√3
+                    </div>
+                </div>
+
+                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                    <span class="font-bold text-amber-400 block mb-1">2. Penjumlahan & Pengurangan</span>
+                    <p class="text-slate-400 mb-1">Hanya bisa dijumlah/dikurang jika **akar sejenis**.</p>
+                    <div class="bg-slate-900 p-1.5 rounded font-mono text-center text-amber-300">
+                        a√c ± b√c = (a ± b)√c &nbsp;➔&nbsp; 3√2 + 5√2 = 8√2
+                    </div>
+                </div>
+
+                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                    <span class="font-bold text-emerald-400 block mb-1">3. Perkalian Bentuk Akar</span>
+                    <p class="text-slate-400 mb-1">Kalikan angka luar dengan luar, dan dalam akar dengan dalam akar.</p>
+                    <div class="bg-slate-900 p-1.5 rounded font-mono text-center text-emerald-300">
+                        (a√b) × (c√d) = (a×c)√(b×d) &nbsp;➔&nbsp; √3 × √12 = √36 = 6
+                    </div>
+                </div>
+            </div>
+
+            <button id="btn-understand-cheatsheet" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-700">
+                Paham, Tutup
+            </button>
+        </div>
+    </div>
+
+    <!-- GAME LOGIC SCRIPT -->
+    <script>
+        /* ==========================================================================
+           1. QUESTION BANK DATASET (Bentuk Akar)
+           ========================================================================== */
+        const QUESTION_BANK = [
+            // Simplifikasi
+            { q: "√12", options: ["2√3", "3√2", "4√3"], correct: 0, exp: "√12 = √(4 × 3) = 2√3" },
+            { q: "√18", options: ["2√3", "3√2", "9√2"], correct: 1, exp: "√18 = √(9 × 2) = 3√2" },
+            { q: "√32", options: ["2√4", "4√2", "8√2"], correct: 1, exp: "√32 = √(16 × 2) = 4√2" },
+            { q: "√48", options: ["4√3", "3√4", "16√3"], correct: 0, exp: "√48 = √(16 × 3) = 4√3" },
+            { q: "√50", options: ["25√2", "2√5", "5√2"], correct: 2, exp: "√50 = √(25 × 2) = 5√2" },
+            { q: "√72", options: ["6√2", "8√3", "2√6"], correct: 0, exp: "√72 = √(36 × 2) = 6√2" },
+            { q: "√75", options: ["3√5", "5√3", "15√3"], correct: 1, exp: "√75 = √(25 × 3) = 5√3" },
+            { q: "√108", options: ["6√3", "9√3", "3√6"], correct: 0, exp: "√108 = √(36 × 3) = 6√3" },
+            { q: "√180", options: ["6√5", "5√6", "10√3"], correct: 0, exp: "√180 = √(36 × 5) = 6√5" },
+
+            // Penjumlahan & Pengurangan
+            { q: "2√3 + 5√3", options: ["7√3", "7√6", "10√3"], correct: 0, exp: "2√3 + 5√3 = (2 + 5)√3 = 7√3" },
+            { q: "8√2 - 3√2", options: ["5√2", "5", "11√2"], correct: 0, exp: "8√2 - 3√2 = (8 - 3)√2 = 5√2" },
+            { q: "√12 + √27", options: ["√39", "5√3", "6√3"], correct: 1, exp: "√12 + √27 = 2√3 + 3√3 = 5√3" },
+            { q: "√50 - √18", options: ["2√2", "4√2", "2√8"], correct: 0, exp: "√50 - √18 = 5√2 - 3√2 = 2√2" },
+            { q: "√20 + √45", options: ["5√5", "65√5", "5√20"], correct: 0, exp: "√20 + √45 = 2√5 + 3√5 = 5√5" },
+
+            // Perkalian & Pembagian
+            { q: "√3 × √12", options: ["6", "√15", "36"], correct: 0, exp: "√3 × √12 = √36 = 6" },
+            { q: "2√5 × 3√2", options: ["5√10", "6√10", "6√7"], correct: 1, exp: "2√5 × 3√2 = (2×3)√(5×2) = 6√10" },
+            { q: "√8 × √2", options: ["4", "√10", "16"], correct: 0, exp: "√8 × √2 = √16 = 4" },
+            { q: "3√2 × 2√3", options: ["6√6", "5√5", "6√5"], correct: 0, exp: "3√2 × 2√3 = (3×2)√(2×3) = 6√6" }
+        ];
+
+        /* ==========================================================================
+           2. AUDIO SYNTHESIZER (Web Audio API)
+           ========================================================================== */
+        class AudioEngine {
+            constructor() {
+                this.ctx = null;
+                this.enabled = true;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+
+            playSwitchLane() {
+                if (!this.enabled) return;
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(350, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(700, this.ctx.currentTime + 0.05);
+                gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.05);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.05);
+            }
+
+            playCorrect() {
+                if (!this.enabled) return;
+                this.init();
+                const now = this.ctx.currentTime;
+                const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                notes.forEach((freq, idx) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.06);
+                    gain.gain.setValueAtTime(0.15, now + idx * 0.06);
+                    gain.gain.linearRampToValueAtTime(0.01, now + idx * 0.06 + 0.12);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now + idx * 0.06);
+                    osc.stop(now + idx * 0.06 + 0.12);
+                });
+            }
+
+            playWrong() {
+                if (!this.enabled) return;
+                this.init();
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, now);
+                osc.frequency.linearRampToValueAtTime(110, now + 0.2);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.2);
+            }
+
+            playGameOver() {
+                if (!this.enabled) return;
+                this.init();
+                const now = this.ctx.currentTime;
+                const notes = [300, 260, 220, 150];
+                notes.forEach((freq, idx) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.15);
+                    gain.gain.setValueAtTime(0.15, now + idx * 0.15);
+                    gain.gain.linearRampToValueAtTime(0.01, now + idx * 0.15 + 0.2);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now + idx * 0.15);
+                    osc.stop(now + idx * 0.15 + 0.2);
+                });
+            }
+        }
+
+        const audio = new AudioEngine();
+
+        /* ==========================================================================
+           3. CANVAS GAME ENGINE & STATE
+           ========================================================================== */
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Game Configuration
+        const LANES = [140, 270, 400]; // Y positions of 3 lanes (Top, Middle, Bottom)
+        const GAME_SPEED_BASE = 6;
+
+        let gameState = {
+            isRunning: false,
+            playerName: "AkarMaster",
+            mode: "normal", // "normal" (3 lives) or "challenge" (1 life)
+            score: 0,
+            lives: 3,
+            combo: 0,
+            maxCombo: 0,
+            speed: GAME_SPEED_BASE,
+            correctCount: 0,
+            totalCount: 0,
+            mistakes: [], // Array to track incorrect questions for review
+            
+            // Player character
+            player: {
+                x: 120,
+                y: LANES[1],
+                targetY: LANES[1],
+                currentLane: 1, // 0: Top, 1: Middle, 2: Bottom
+                radius: 24,
+                animFrame: 0
+            },
+
+            // Game World & Objects
+            bgOffset: 0,
+            gates: [], // Gate obstacles containing answers
+            particles: [], // Celebration particles
+            currentQuestion: null,
+            questionPool: [],
+            screenShakeTime: 0
+        };
+
+        // Select Game Mode
+        function selectMode(mode) {
+            gameState.mode = mode;
+            const btnNormal = document.getElementById('mode-normal');
+            const btnChallenge = document.getElementById('mode-challenge');
+
+            if (mode === 'normal') {
+                btnNormal.className = "mode-btn py-2.5 px-3 rounded-xl border border-indigo-500 bg-indigo-600/30 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all";
+                btnChallenge.className = "mode-btn py-2.5 px-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-400 font-bold text-xs flex items-center justify-center gap-2 transition-all";
+            } else {
+                btnChallenge.className = "mode-btn py-2.5 px-3 rounded-xl border border-amber-500 bg-amber-600/30 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all";
+                btnNormal.className = "mode-btn py-2.5 px-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-400 font-bold text-xs flex items-center justify-center gap-2 transition-all";
+            }
+        }
+
+        /* ==========================================================================
+           4. GAMEINIT & LOOP
+           ========================================================================== */
+        function initGame() {
+            const nameInput = document.getElementById('player-name-input').value.trim();
+            gameState.playerName = nameInput || "AkarMaster";
+            gameState.score = 0;
+            gameState.lives = gameState.mode === 'normal' ? 3 : 1;
+            gameState.combo = 0;
+            gameState.maxCombo = 0;
+            gameState.speed = GAME_SPEED_BASE;
+            gameState.correctCount = 0;
+            gameState.totalCount = 0;
+            gameState.mistakes = [];
+            gameState.gates = [];
+            gameState.particles = [];
+            
+            // Reset player
+            gameState.player.currentLane = 1;
+            gameState.player.y = LANES[1];
+            gameState.player.targetY = LANES[1];
+
+            // Shuffle question pool
+            gameState.questionPool = [...QUESTION_BANK].sort(() => Math.random() - 0.5);
+
+            // Update UI HUD
+            document.getElementById('hud-player-name').innerText = gameState.playerName;
+            updateLivesHUD();
+            document.getElementById('hud-score-display').innerText = "0";
+            document.getElementById('menu-overlay').classList.add('hidden');
+            document.getElementById('gameover-overlay').classList.add('hidden');
+            document.getElementById('game-hud').classList.remove('hidden');
+
+            spawnNextQuestionAndGates();
+
+            gameState.isRunning = true;
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Spawn a new math question and create 3 gates across lanes
+        function spawnNextQuestionAndGates() {
+            if (gameState.questionPool.length === 0) {
+                gameState.questionPool = [...QUESTION_BANK].sort(() => Math.random() - 0.5);
+            }
+
+            const qData = gameState.questionPool.pop();
+            gameState.currentQuestion = qData;
+
+            // Update Header HUD Question Box
+            document.getElementById('hud-question-text').innerText = `${qData.q} = ?`;
+
+            // Gate X Position starting outside right screen
+            const spawnX = canvas.width + 100;
+
+            // Create 3 gates for top, middle, and bottom lanes
+            const gateOptions = [...qData.options];
+            
+            gameState.gates = LANES.map((laneY, index) => {
+                return {
+                    x: spawnX,
+                    y: laneY,
+                    width: 70,
+                    height: 90,
+                    laneIndex: index,
+                    text: gateOptions[index],
+                    isCorrect: index === qData.correct,
+                    passed: false
+                };
+            });
+        }
+
+        // Main Animation Loop
+        function gameLoop() {
+            if (!gameState.isRunning) return;
+
+            update();
+            render();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        /* ==========================================================================
+           5. GAME LOGIC UPDATES
+           ========================================================================== */
+        function update() {
+            // Smooth player vertical movement between lanes
+            const p = gameState.player;
+            p.y += (p.targetY - p.y) * 0.25;
+            p.animFrame += 0.2;
+
+            // Update background parallax offset
+            gameState.bgOffset += gameState.speed * 0.5;
+
+            // Screen Shake Decay
+            if (gameState.screenShakeTime > 0) {
+                gameState.screenShakeTime--;
+            }
+
+            // Move Gates
+            let gatesPassedThisFrame = false;
+
+            for (let i = 0; i < gameState.gates.length; i++) {
+                const gate = gameState.gates[i];
+                gate.x -= gameState.speed;
+
+                // Collision Detection with Player
+                if (!gate.passed && checkCollision(p, gate)) {
+                    gate.passed = true;
+                    gatesPassedThisFrame = true;
+
+                    gameState.totalCount++;
+
+                    if (gate.isCorrect) {
+                        // CORRECT GATE
+                        audio.playCorrect();
+                        gameState.correctCount++;
+                        gameState.combo++;
+                        if (gameState.combo > gameState.maxCombo) gameState.maxCombo = gameState.combo;
+
+                        // Points logic
+                        const points = 100 + (gameState.combo * 20);
+                        gameState.score += points;
+                        gameState.speed = Math.min(12, gameState.speed + 0.2); // Gradually increase speed
+
+                        // Spawn Particles
+                        createParticles(gate.x, gate.y);
+
+                        // HUD updates
+                        showComboBadge();
+                    } else {
+                        // WRONG GATE
+                        audio.playWrong();
+                        gameState.lives--;
+                        gameState.combo = 0;
+                        gameState.speed = Math.max(GAME_SPEED_BASE, gameState.speed - 1);
+                        gameState.screenShakeTime = 15;
+
+                        // Save mistake for review
+                        gameState.mistakes.push({
+                            q: gameState.currentQuestion.q,
+                            chosen: gate.text,
+                            correct: gameState.currentQuestion.options[gameState.currentQuestion.correct],
+                            exp: gameState.currentQuestion.exp
+                        });
+
+                        updateLivesHUD();
+                        showFeedbackTooltip(`Salah! ${gameState.currentQuestion.exp}`);
+                        hideComboBadge();
+
+                        if (gameState.lives <= 0) {
+                            gameOver();
+                            return;
+                        }
+                    }
+                }
+            }
+
+            // If all gates have moved off screen, spawn next set
+            if (gameState.gates.length > 0 && gameState.gates[0].x < -100) {
+                spawnNextQuestionAndGates();
+            }
+
+            // Update Particles
+            for (let i = gameState.particles.length - 1; i >= 0; i--) {
+                const pt = gameState.particles[i];
+                pt.x += pt.vx;
+                pt.y += pt.vy;
+                pt.alpha -= 0.02;
+                if (pt.alpha <= 0) {
+                    gameState.particles.splice(i, 1);
+                }
+            }
+
+            // Update Score HUD Display
+            document.getElementById('hud-score-display').innerText = gameState.score.toLocaleString();
+        }
+
+        // Simple Circle-Box Collision Test
+        function checkCollision(player, gate) {
+            const dx = Math.abs(player.x - gate.x);
+            const dy = Math.abs(player.y - gate.y);
+
+            if (dx < (gate.width / 2 + player.radius) && dy < (gate.height / 2 + player.radius)) {
+                return true;
+            }
+            return false;
+        }
+
+        // Player Controls (Lane Switching)
+        function moveLane(direction) {
+            if (!gameState.isRunning) return;
+
+            const p = gameState.player;
+            if (direction === 'up' && p.currentLane > 0) {
+                p.currentLane--;
+                p.targetY = LANES[p.currentLane];
+                audio.playSwitchLane();
+            } else if (direction === 'down' && p.currentLane < 2) {
+                p.currentLane++;
+                p.targetY = LANES[p.currentLane];
+                audio.playSwitchLane();
+            }
+        }
+
+        /* ==========================================================================
+           6. RENDERING SYSTEM (CANVAS GRAPHICS)
+           ========================================================================== */
+        function render() {
+            ctx.save();
+
+            // Apply Screen Shake if hurt
+            if (gameState.screenShakeTime > 0) {
+                const dx = (Math.random() - 0.5) * 8;
+                const dy = (Math.random() - 0.5) * 8;
+                ctx.translate(dx, dy);
+            }
+
+            // 1. Draw Background (Cyber Grid & Cave Sky)
+            drawParallaxBackground();
+
+            // 2. Draw 3 Running Lanes / Tracks
+            drawLanes();
+
+            // 3. Draw Gate Obstacles (Answers)
+            drawGates();
+
+            // 4. Draw Particles
+            drawParticles();
+
+            // 5. Draw Player Character
+            drawPlayer();
+
+            ctx.restore();
+        }
+
+        function drawParallaxBackground() {
+            // Dark Gradient Sky
+            const bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            bgGradient.addColorStop(0, '#020617');
+            bgGradient.addColorStop(0.5, '#0f172a');
+            bgGradient.addColorStop(1, '#1e1b4b');
+            ctx.fillStyle = bgGradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Distant Math Symbols floating
+            ctx.fillStyle = 'rgba(129, 140, 248, 0.08)';
+            ctx.font = '24px Outfit';
+            const symbols = ['√2', '√3', '√5', 'a√b', '√x²'];
+            for (let i = 0; i < 8; i++) {
+                const x = (i * 150 - (gameState.bgOffset * 0.3) % 1200 + 1200) % 1200;
+                const y = 50 + (i * 40) % 150;
+                ctx.fillText(symbols[i % symbols.length], x, y);
+            }
+        }
+
+        function drawLanes() {
+            LANES.forEach((laneY, index) => {
+                // Lane Line Grid
+                ctx.strokeStyle = index === gameState.player.currentLane ? 'rgba(129, 140, 248, 0.4)' : 'rgba(51, 65, 85, 0.3)';
+                ctx.lineWidth = index === gameState.player.currentLane ? 3 : 1;
+
+                ctx.beginPath();
+                ctx.moveTo(0, laneY + 35);
+                ctx.lineTo(canvas.width, laneY + 35);
+                ctx.stroke();
+
+                // Dotted motion lines
+                ctx.fillStyle = 'rgba(168, 85, 247, 0.25)';
+                for (let x = -(gameState.bgOffset % 40); x < canvas.width; x += 40) {
+                    ctx.fillRect(x, laneY + 33, 15, 4);
+                }
+            });
+        }
+
+        function drawGates() {
+            gameState.gates.forEach(gate => {
+                ctx.save();
+                ctx.translate(gate.x, gate.y);
+
+                // Gate Frame Glow
+                const isCorrectColor = gate.isCorrect ? '#10b981' : '#f43f5e';
+                
+                // Outer Gate Crystal Border
+                ctx.strokeStyle = '#6366f1';
+                ctx.lineWidth = 4;
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+
+                ctx.beginPath();
+                ctx.roundRect(-gate.width/2, -gate.height/2, gate.width, gate.height, 12);
+                ctx.fill();
+                ctx.stroke();
+
+                // Inner Portal Light
+                ctx.fillStyle = 'rgba(99, 102, 241, 0.2)';
+                ctx.fillRect(-gate.width/2 + 6, -gate.height/2 + 6, gate.width - 12, gate.height - 12);
+
+                // Answer Text Label
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 18px Outfit, monospace';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(gate.text, 0, 0);
+
+                ctx.restore();
+            });
+        }
+
+        function drawPlayer() {
+            const p = gameState.player;
+            ctx.save();
+            ctx.translate(p.x, p.y);
+
+            // Glow effect around player
+            const glow = ctx.createRadialGradient(0, 0, 5, 0, 0, p.radius + 10);
+            glow.addColorStop(0, 'rgba(236, 72, 153, 0.8)');
+            glow.addColorStop(1, 'rgba(236, 72, 153, 0)');
+            ctx.fillStyle = glow;
+            ctx.beginPath();
+            ctx.arc(0, 0, p.radius + 10, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Main Cyber Runner Sphere Body
+            const bodyGrad = ctx.createLinearGradient(-p.radius, -p.radius, p.radius, p.radius);
+            bodyGrad.addColorStop(0, '#ec4899'); // Pink
+            bodyGrad.addColorStop(1, '#6366f1'); // Indigo
+
+            ctx.fillStyle = bodyGrad;
+            ctx.beginPath();
+            ctx.arc(0, 0, p.radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Visor / Eye Symbol (Square Root Sign √)
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'black 18px Outfit';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('√x', 0, 0);
+
+            // Running dust trail particles
+            ctx.fillStyle = 'rgba(236, 72, 153, 0.4)';
+            const trailOffset = Math.sin(p.animFrame) * 4;
+            ctx.beginPath();
+            ctx.arc(-p.radius - 8, trailOffset, 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function createParticles(x, y) {
+            for (let i = 0; i < 20; i++) {
+                gameState.particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 8,
+                    vy: (Math.random() - 0.5) * 8,
+                    color: ['#10b981', '#34d399', '#f472b6', '#fbbf24'][Math.floor(Math.random() * 4)],
+                    alpha: 1
+                });
+            }
+        }
+
+        function drawParticles() {
+            gameState.particles.forEach(pt => {
+                ctx.save();
+                ctx.globalAlpha = pt.alpha;
+                ctx.fillStyle = pt.color;
+                ctx.beginPath();
+                ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            });
+        }
+
+        /* ==========================================================================
+           7. UI HELPERS & GAME OVER
+           ========================================================================== */
+        function updateLivesHUD() {
+            const container = document.getElementById('player-lives-display');
+            container.innerHTML = '';
+            for (let i = 0; i < (gameState.mode === 'normal' ? 3 : 1); i++) {
+                if (i < gameState.lives) {
+                    container.innerHTML += '<i class="fa-solid fa-heart"></i>';
+                } else {
+                    container.innerHTML += '<i class="fa-regular fa-heart text-slate-700"></i>';
+                }
+            }
+        }
+
+        function showComboBadge() {
+            const badge = document.getElementById('hud-combo-badge');
+            const text = document.getElementById('hud-combo-text');
+            if (gameState.combo >= 2) {
+                text.innerText = `${gameState.combo}x Combo!`;
+                badge.classList.remove('opacity-0');
+            }
+        }
+
+        function hideComboBadge() {
+            document.getElementById('hud-combo-badge').classList.add('opacity-0');
+        }
+
+        function showFeedbackTooltip(msg) {
+            const tooltip = document.getElementById('feedback-tooltip');
+            document.getElementById('feedback-text').innerText = msg;
+            tooltip.classList.remove('opacity-0', 'translate-y-4');
+            
+            setTimeout(() => {
+                tooltip.classList.add('opacity-0', 'translate-y-4');
+            }, 3000);
+        }
+
+        function gameOver() {
+            gameState.isRunning = false;
+            audio.playGameOver();
+
+            document.getElementById('game-hud').classList.add('hidden');
+            
+            // Stats summary
+            document.getElementById('result-player-title').innerText = `Hasil Latihan ${gameState.playerName}`;
+            document.getElementById('result-score').innerText = gameState.score.toLocaleString();
+            document.getElementById('result-accuracy').innerText = `${gameState.correctCount} / ${gameState.totalCount}`;
+            document.getElementById('result-max-combo').innerText = `${gameState.maxCombo}x`;
+
+            // Calculate Rating
+            const accuracyPct = gameState.totalCount > 0 ? (gameState.correctCount / gameState.totalCount) * 100 : 0;
+            const badge = document.getElementById('result-rating-badge');
+            if (accuracyPct >= 85) {
+                badge.innerText = "Sangat Baik 🌟";
+                badge.className = "text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+            } else if (accuracyPct >= 60) {
+                badge.innerText = "Cukup Baik 👍";
+                badge.className = "text-[10px] px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30";
+            } else {
+                badge.innerText = "Perlu Belajar Lagi 📖";
+                badge.className = "text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30";
+            }
+
+            // Mistakes Review List
+            const mistakesListContainer = document.getElementById('result-mistakes-list');
+            mistakesListContainer.innerHTML = '';
+
+            if (gameState.mistakes.length === 0) {
+                mistakesListContainer.innerHTML = `<div class="text-emerald-400 text-center py-2"><i class="fa-solid fa-circle-check"></i> Luar biasa! Kamu menjawab semua soal dengan tepat!</div>`;
+            } else {
+                gameState.mistakes.forEach(item => {
+                    mistakesListContainer.innerHTML += `
+                        <div class="bg-slate-900 p-2 rounded border border-slate-800">
+                            <span class="text-slate-400">Soal: <strong class="text-white">${item.q}</strong></span>
+                            <div class="flex justify-between text-[11px] mt-0.5">
+                                <span class="text-rose-400">Jawabanmu: ${item.chosen}</span>
+                                <span class="text-emerald-400">Harusnya: ${item.correct}</span>
+                            </div>
+                            <div class="text-[10px] text-amber-300/90 italic mt-1">${item.exp}</div>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('gameover-overlay').classList.remove('hidden');
+        }
+
+        /* ==========================================================================
+           8. INPUT CONTROLS & LISTENERS
+           ========================================================================== */
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+                moveLane('up');
+            } else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
+                moveLane('down');
+            }
+        });
+
+        // Mobile On-Screen Controls
+        document.getElementById('btn-touch-up').addEventListener('click', () => moveLane('up'));
+        document.getElementById('btn-touch-down').addEventListener('click', () => moveLane('down'));
+
+        // Start Game Button
+        document.getElementById('btn-start-game').addEventListener('click', () => {
+            audio.init();
+            initGame();
+        });
+
+        document.getElementById('btn-restart-game').addEventListener('click', () => {
+            initGame();
+        });
+
+        document.getElementById('btn-back-menu').addEventListener('click', () => {
+            document.getElementById('gameover-overlay').classList.add('hidden');
+            document.getElementById('menu-overlay').classList.remove('hidden');
+        });
+
+        // Modal Handlers
+        const cheatsheetModal = document.getElementById('cheatsheet-modal');
+        document.getElementById('btn-cheatsheet').addEventListener('click', () => {
+            cheatsheetModal.classList.remove('hidden');
+        });
+        document.getElementById('btn-close-cheatsheet').addEventListener('click', () => {
+            cheatsheetModal.classList.add('hidden');
+        });
+        document.getElementById('btn-understand-cheatsheet').addEventListener('click', () => {
+            cheatsheetModal.classList.add('hidden');
+        });
+
+        // Audio Mute Toggle
+        const soundBtn = document.getElementById('btn-sound');
+        const soundIcon = document.getElementById('sound-icon');
+        soundBtn.addEventListener('click', () => {
+            audio.enabled = !audio.enabled;
+            if (audio.enabled) {
+                soundIcon.className = 'fa-solid fa-volume-high';
+                soundBtn.classList.remove('opacity-50');
+            } else {
+                soundIcon.className = 'fa-solid fa-volume-xmark';
+                soundBtn.classList.add('opacity-50');
+            }
+        });
+    </script>
+</body>
+</html>
