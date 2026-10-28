@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarik Tambang Statistika - SMK Kelas 10</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font Inter & Fredoka -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+        }
+        .font-game {
+            font-family: 'Fredoka', cursive, sans-serif;
+        }
+        
+        /* Custom animations */
+        @keyframes pullLeft {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(-25px) rotate(-3deg); }
+            100% { transform: translateX(0); }
+        }
+        @keyframes pullRight {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(25px) rotate(3deg); }
+            100% { transform: translateX(0); }
+        }
+        .animate-pull-left {
+            animation: pullLeft 0.6s ease-in-out;
+        }
+        .animate-pull-right {
+            animation: pullRight 0.6s ease-in-out;
+        }
+
+        /* Pulse aura effect */
+        .glow-blue {
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.5);
+        }
+        .glow-red {
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.5);
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen justify-between p-3 sm:p-6">
+
+    <!-- HEADER / BANNER -->
+    <header class="max-w-4xl mx-auto w-full text-center mb-4">
+        <div class="inline-block bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 px-6 py-2 rounded-full shadow-lg mb-2">
+            <span class="text-xs sm:text-sm font-semibold tracking-wider text-blue-100 uppercase">🎮 Game Edukasi Interaktif</span>
+        </div>
+        <h1 class="text-3xl sm:text-5xl font-black font-game text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-orange-400 to-amber-200 drop-shadow-md">
+            TARIK TAMBANG STATISTIKA
+        </h1>
+        <p class="text-slate-400 text-xs sm:text-sm mt-1">Matematika / Statistika Dasar - SMK Kelas 10</p>
+    </header>
+
+    <!-- MAIN GAME CONTAINER -->
+    <main class="max-w-4xl mx-auto w-full flex-grow flex flex-col justify-between gap-4">
+
+        <!-- SCOREBOARD & STATS BAR -->
+        <div class="bg-slate-800/80 backdrop-blur border border-slate-700 rounded-2xl p-4 shadow-xl flex flex-wrap items-center justify-between gap-3">
+            <!-- Tim Kiri (Siswa) -->
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl bg-blue-500/20 border border-blue-400 flex items-center justify-center text-blue-400 text-2xl font-bold">
+                    👨‍🎓
+                </div>
+                <div>
+                    <h3 class="font-bold text-blue-400 text-sm sm:text-base">TIM SISWA (KAMU)</h3>
+                    <p class="text-xs text-slate-400">Skor: <span id="score-user" class="text-lg font-bold text-yellow-400">0</span></p>
+                </div>
+            </div>
+
+            <!-- Progress Pertanyaan -->
+            <div class="text-center bg-slate-900/60 px-4 py-2 rounded-xl border border-slate-700">
+                <span class="text-xs text-slate-400 block font-medium">SOAL</span>
+                <span id="question-number" class="text-lg sm:text-xl font-black text-white font-game">1 / 5</span>
+            </div>
+
+            <!-- Tim Kanan (Komputer) -->
+            <div class="flex items-center gap-3 flex-row-reverse sm:flex-row">
+                <div class="text-right sm:text-left">
+                    <h3 class="font-bold text-red-400 text-sm sm:text-base">TIM BOT (AI)</h3>
+                    <p class="text-xs text-slate-400">Skor: <span id="score-bot" class="text-lg font-bold text-yellow-400">0</span></p>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-red-500/20 border border-red-400 flex items-center justify-center text-red-400 text-2xl font-bold">
+                    🤖
+                </div>
+            </div>
+        </div>
+
+        <!-- ARENA TARIK TAMBANG (CANVAS) -->
+        <div class="relative bg-slate-900 border-2 border-slate-700 rounded-2xl overflow-hidden shadow-2xl p-2 sm:p-4">
+            <!-- Overlay Label Batas Kemenangan -->
+            <div class="absolute top-2 left-4 text-xs font-bold text-blue-400 bg-blue-950/70 border border-blue-800/50 px-2 py-1 rounded z-10">
+                ⬅️ Zona Menang Siswa
+            </div>
+            <div class="absolute top-2 right-4 text-xs font-bold text-red-400 bg-red-950/70 border border-red-800/50 px-2 py-1 rounded z-10">
+                Zona Menang Bot ➡️
+            </div>
+
+            <!-- Game Canvas -->
+            <canvas id="tugCanvas" class="w-full h-44 sm:h-56 block rounded-lg"></canvas>
+
+            <!-- Text Dynamic Status -->
+            <div id="game-status-text" class="text-center text-xs sm:text-sm font-semibold text-slate-300 mt-2 h-5">
+                Jawab pertanyaan dengan benar untuk menarik tali ke kiri!
+            </div>
+        </div>
+
+        <!-- KOTAK PERTANYAAN & PILIHAN -->
+        <div id="quiz-container" class="bg-slate-800/90 border border-slate-700 rounded-2xl p-4 sm:p-6 shadow-xl relative">
+            <!-- Soal Text -->
+            <div class="mb-4">
+                <span id="question-tag" class="inline-block bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs px-2.5 py-1 rounded-md mb-2 font-medium">
+                    Topik: Definisi Statistika
+                </span>
+                <h2 id="question-text" class="text-base sm:text-lg font-semibold text-slate-100 leading-relaxed">
+                    Pertanyaan akan muncul di sini...
+                </h2>
+            </div>
+
+            <!-- Pilihan Jawaban Grid -->
+            <div id="options-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <!-- Dibangkitkan via JavaScript -->
+            </div>
+
+            <!-- EDUKASI / FEEDBACK BOX (Hidden by default) -->
+            <div id="feedback-box" class="hidden mt-4 p-4 rounded-xl border text-sm leading-relaxed transition-all">
+                <div class="flex items-start gap-3">
+                    <span id="feedback-icon" class="text-2xl"></span>
+                    <div>
+                        <h4 id="feedback-title" class="font-bold text-base mb-1"></h4>
+                        <p id="feedback-text" class="text-slate-200"></p>
+                    </div>
+                </div>
+                <button id="next-btn" onclick="nextQuestion()" class="mt-3 w-full sm:w-auto px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 font-bold rounded-xl text-white shadow-lg transition transform active:scale-95 flex items-center justify-center gap-2 ml-auto">
+                    <span>Lanjut Soal Berikutnya</span>
+                    <i class="fa-solid font-bold fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- RESULT CARD (Hidden by default) -->
+        <div id="result-card" class="hidden bg-slate-800/95 border-2 border-slate-600 rounded-2xl p-6 text-center shadow-2xl my-auto">
+            <div id="result-emoji" class="text-6xl mb-2 animate-bounce">🏆</div>
+            <h2 id="result-title" class="text-2xl sm:text-4xl font-black font-game text-yellow-400 mb-2">
+                TIM SISWA MENANG!
+            </h2>
+            <p id="result-desc" class="text-slate-300 text-sm sm:text-base mb-6 max-w-lg mx-auto">
+                Luar biasa! Kamu berhasil menguasai konsep dasar Statistika dengan sangat baik.
+            </p>
+
+            <div class="bg-slate-900/80 rounded-xl p-4 max-w-xs mx-auto mb-6 border border-slate-700 flex justify-around">
+                <div>
+                    <span class="text-xs text-slate-400 block">Jawaban Benar</span>
+                    <span id="final-correct" class="text-2xl font-bold text-green-400">0</span>
+                </div>
+                <div class="border-r border-slate-700"></div>
+                <div>
+                    <span class="text-xs text-slate-400 block">Total Skor</span>
+                    <span id="final-score" class="text-2xl font-bold text-yellow-400">0</span>
+                </div>
+            </div>
+
+            <button onclick="restartGame()" class="px-8 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 font-bold text-lg rounded-xl text-white shadow-xl transition transform active:scale-95 inline-flex items-center gap-2">
+                <i class="fa-solid fa-rotate-right"></i>
+                <span>Main Lagi</span>
+            </button>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="max-w-4xl mx-auto w-full text-center mt-6 text-xs text-slate-500">
+        &copy; Game Edukasi Tarik Tambang Statistika - Media Pembelajaran Interaktif SMK Class 10
+    </footer>
+
+    <!-- AUDIO SYNTHESIZER (Web Audio API) -->
+    <script>
+        // Simple Audio Synthesizer for SFX without external asset dependencies
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'correct') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.exponentialRampToValueAtTime(880, now + 0.3);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, now);
+                osc.frequency.exponentialRampToValueAtTime(110, now + 0.3);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'win') {
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, idx) => {
+                    const noteOsc = audioCtx.createOscillator();
+                    const noteGain = audioCtx.createGain();
+                    noteOsc.connect(noteGain);
+                    noteGain.connect(audioCtx.destination);
+                    noteOsc.frequency.value = freq;
+                    noteGain.gain.setValueAtTime(0.2, now + idx * 0.12);
+                    noteGain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.12 + 0.25);
+                    noteOsc.start(now + idx * 0.12);
+                    noteOsc.stop(now + idx * 0.12 + 0.25);
+                });
+            }
+        }
+    </script>
+
+    <!-- GAME LOGIC & CANVAS ANIMATION -->
+    <script>
+        // SOAL STATISTIKA SMK KELAS 10
+        const questionsData = [
+            {
+                tag: "Populasi vs Sampel",
+                question: "Seorang peneliti ingin mengetahui rata-rata tinggi badan seluruh siswa di SMK Merdeka. Peneliti tersebut hanya mengukur 50 siswa yang dipilih secara acak. Dalam kegiatan ini, 50 siswa tersebut dinamakan...",
+                options: [
+                    "Populasi",
+                    "Sampel",
+                    "Data Kualitatif",
+                    "Parameter"
+                ],
+                correct: 1,
+                explanation: " Sampel adalah bagian dari jumlah dan karakteristik yang dimiliki oleh populasi yang diambil untuk mewakili seluruh kelompok."
+            },
+            {
+                tag: "Jenis Data",
+                question: "Data mengenai merk sepeda motor yang dipakai oleh siswa SMK (seperti: Honda, Yamaha, Suzuki) termasuk ke dalam jenis data...",
+                options: [
+                    "Kuantitatif Diskrit",
+                    "Kuantitatif Kontinu",
+                    "Kualitatif (Kategori)",
+                    "Sekunder"
+                ],
+                correct: 2,
+                explanation: " Data Kualitatif adalah data berbentuk kata-kata/kategori, bukan berupa angka perhitungan matematika."
+            },
+            {
+                tag: "Data Diskrit vs Kontinu",
+                question: "Manakah di antara pilihan data berikut yang termasuk jenis Data Kuantitatif Diskrit?",
+                options: [
+                    "Jumlah komputer di laboratorium SMK (15 unit)",
+                    "Berat badan siswa (54,5 kg)",
+                    "Tinggi gedung sekolah (12,8 meter)",
+                    "Waktu tempuh ke sekolah (25,5 menit)"
+                ],
+                correct: 0,
+                explanation: " Data Diskrit diperoleh dari hasil membilang/menghitung dan berupa bilangan bulat (tidak bisa pecahan seperti 15,5 unit komputer)."
+            },
+            {
+                tag: "Ukuran Pemusatan Data",
+                question: "Diberikan data nilai ujian nilai statistika 5 siswa: 7, 8, 6, 8, 9. Berapakah nilai Median (nilai tengah) dari data tersebut?",
+                options: [
+                    "6",
+                    "7",
+                    "8",
+                    "8.5"
+                ],
+                correct: 2,
+                explanation: " Urutkan data terlebih dahulu: 6, 7, 8, 8, 9. Nilai yang berada tepat di tengah (data ke-3) adalah 8."
+            },
+            {
+                tag: "Penyajian Data",
+                question: "Grafik yang paling tepat dan cocok digunakan untuk melihat perkembangan atau tren data yang berkelanjutan dari waktu ke waktu adalah...",
+                options: [
+                    "Diagram Lingkaran",
+                    "Diagram Batang",
+                    "Diagram Garis",
+                    "Piktogram"
+                ],
+                correct: 2,
+                explanation: " Diagram Garis sangat ideal untuk menampilkan tren atau perubahan data secara kontinu berdasarkan urutan waktu."
+            }
+        ];
+
+        // GAME STATE VARIABLES
+        let currentQIndex = 0;
+        let scoreUser = 0;
+        let scoreBot = 0;
+        let ropePosition = 0; // 0 = Center, Negative = Left (User), Positive = Right (Bot)
+        let targetRopePos = 0;
+        let isAnswered = false;
+
+        // CANVAS SETUP
+        const canvas = document.getElementById('tugCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // RENDER CANVAS ANIMATION LOOP
+        function drawScene() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const width = canvas.width;
+            const height = canvas.height;
+            const centerY = height / 2 + 10;
+
+            // Smooth interpolation for rope movement
+            ropePosition += (targetRopePos - ropePosition) * 0.1;
+
+            // 1. Draw Field / Grass Ground
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(0, 0, width, height);
+
+            // Ground line
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(0, centerY + 35);
+            ctx.lineTo(width, centerY + 35);
+            ctx.stroke();
+
+            // Center Mark Line & Victory Zones
+            const centerX = width / 2;
+            const shiftX = ropePosition * (width * 0.07); // movement factor
+
+            // Center line limit marker
+            ctx.setLineDash([5, 5]);
+            ctx.strokeStyle = '#64748b';
+            ctx.beginPath();
+            ctx.moveTo(centerX, 20);
+            ctx.lineTo(centerX, height - 10);
+            ctx.stroke();
+            ctx.setLineDash([]); // Reset dash
+
+            // 2. Draw Rope
+            const ropeY = centerY;
+            ctx.strokeStyle = '#d97706'; // Amber rope color
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(40, ropeY);
+            ctx.lineTo(width - 40, ropeY);
+            ctx.stroke();
+
+            // Rope Texture Overlay (Dotted line effect for twist look)
+            ctx.strokeStyle = '#b45309';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([4, 6]);
+            ctx.beginPath();
+            ctx.moveTo(40, ropeY);
+            ctx.lineTo(width - 40, ropeY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // 3. Draw Red Ribbon Marker in Middle of Rope
+            const ribbonX = centerX + shiftX;
+            ctx.fillStyle = '#ef4444';
+            ctx.beginPath();
+            ctx.arc(ribbonX, ropeY, 9, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(ribbonX - 2, ropeY, 4, 15);
+
+            // 4. Draw Characters (Left Team - User, Right Team - Bot)
+            // Left Team (User)
+            const userGroupX = ribbonX - 110;
+            drawStickFigure(userGroupX, ropeY + 30, '#3b82f6', 'left');
+            drawStickFigure(userGroupX - 45, ropeY + 30, '#60a5fa', 'left');
+
+            // Right Team (Bot)
+            const botGroupX = ribbonX + 110;
+            drawStickFigure(botGroupX, ropeY + 30, '#ef4444', 'right');
+            drawStickFigure(botGroupX + 45, ropeY + 30, '#f87171', 'right');
+
+            requestAnimationFrame(drawScene);
+        }
+
+        // Helper Function to Draw Cute Stick Figures pulling
+        function drawStickFigure(x, y, color, direction) {
+            ctx.save();
+            ctx.translate(x, y);
+
+            const isLeft = direction === 'left';
+            const leanAngle = isLeft ? -0.2 : 0.2; // Lean backwards pulling style
+            ctx.rotate(leanAngle);
+
+            // Head
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(0, -50, 14, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Face (Eyes)
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(isLeft ? 4 : -4, -53, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Body
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 6;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(0, -35);
+            ctx.lineTo(0, -10);
+            ctx.stroke();
+
+            // Arms holding rope
+            ctx.beginPath();
+            ctx.moveTo(0, -30);
+            ctx.lineTo(isLeft ? 15 : -15, -30);
+            ctx.stroke();
+
+            // Legs pulling
+            ctx.beginPath();
+            ctx.moveTo(0, -10);
+            ctx.lineTo(isLeft ? -15 : 15, 12);
+            ctx.moveTo(0, -10);
+            ctx.lineTo(isLeft ? 15 : -15, 12);
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        // INIT GAME & UI LOAD
+        function loadQuestion() {
+            isAnswered = false;
+            const q = questionsData[currentQIndex];
+
+            // Update UI Counters
+            document.getElementById('question-number').innerText = `${currentQIndex + 1} / ${questionsData.length}`;
+            document.getElementById('question-tag').innerText = `Topik: ${q.tag}`;
+            document.getElementById('question-text').innerText = q.question;
+
+            // Hide Feedback Box
+            document.getElementById('feedback-box').classList.add('hidden');
+
+            // Render Options
+            const optionsGrid = document.getElementById('options-grid');
+            optionsGrid.innerHTML = '';
+
+            const optionLabels = ['A', 'B', 'C', 'D'];
+            q.options.forEach((optText, i) => {
+                const btn = document.createElement('button');
+                btn.className = `option-btn w-full p-3.5 sm:p-4 rounded-xl border-2 border-slate-700 bg-slate-800/60 hover:bg-slate-700/80 hover:border-indigo-500 text-left flex items-start gap-3 transition-all duration-200 transform active:scale-98`;
+                btn.onclick = () => checkAnswer(i);
+                
+                btn.innerHTML = `
+                    <span class="w-7 h-7 rounded-lg bg-slate-700 text-slate-200 font-bold flex items-center justify-center text-xs sm:text-sm shrink-0">
+                        ${optionLabels[i]}
+                    </span>
+                    <span class="text-xs sm:text-sm text-slate-200 font-medium leading-normal my-auto">
+                        ${optText}
+                    </span>
+                `;
+                optionsGrid.appendChild(btn);
+            });
+        }
+
+        // CHECK ANSWER LOGIC
+        function checkAnswer(selectedIndex) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            const q = questionsData[currentQIndex];
+            const optionBtns = document.querySelectorAll('.option-btn');
+            const feedbackBox = document.getElementById('feedback-box');
+            const feedbackIcon = document.getElementById('feedback-icon');
+            const feedbackTitle = document.getElementById('feedback-title');
+            const feedbackText = document.getElementById('feedback-text');
+            const statusText = document.getElementById('game-status-text');
+
+            // Disable all buttons
+            optionBtns.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.remove('hover:bg-slate-700/80', 'hover:border-indigo-500');
+            });
+
+            if (selectedIndex === q.correct) {
+                // CORRET ANSWER
+                playSound('correct');
+                scoreUser++;
+                targetRopePos -= 1; // Pull left towards user
+                
+                optionBtns[selectedIndex].classList.add('border-green-500', 'bg-green-500/20');
+                
+                feedbackBox.className = "mt-4 p-4 rounded-xl border border-green-500/50 bg-green-950/40 text-sm leading-relaxed";
+                feedbackIcon.innerText = "✅";
+                feedbackTitle.innerText = "BENAR! TIM SISWA MENARIK TALI!";
+                feedbackTitle.className = "font-bold text-base text-green-400 mb-1";
+                
+                statusText.innerText = "💪 Mantap! Jawabanmu benar, tim siswa berhasil menarik tali!";
+                statusText.className = "text-center text-xs sm:text-sm font-semibold text-green-400 mt-2 h-5";
+            } else {
+                // WRONG ANSWER
+                playSound('wrong');
+                scoreBot++;
+                targetRopePos += 1; // Pull right towards bot
+
+                optionBtns[selectedIndex].classList.add('border-red-500', 'bg-red-500/20');
+                optionBtns[q.correct].classList.add('border-green-500', 'bg-green-500/10');
+
+                feedbackBox.className = "mt-4 p-4 rounded-xl border border-red-500/50 bg-red-950/40 text-sm leading-relaxed";
+                feedbackIcon.innerText = "❌";
+                feedbackTitle.innerText = "SALAH! BOT MENARIK TALI!";
+                feedbackTitle.className = "font-bold text-base text-red-400 mb-1";
+
+                statusText.innerText = "⚠️ Sayang sekali! Jawaban salah, Bot mengambil alih tarikan!";
+                statusText.className = "text-center text-xs sm:text-sm font-semibold text-red-400 mt-2 h-5";
+            }
+
+            // Update Scores UI
+            document.getElementById('score-user').innerText = scoreUser;
+            document.getElementById('score-bot').innerText = scoreBot;
+
+            // Show Feedback & Explanation
+            feedbackText.innerHTML = `${q.explanation}`;
+            feedbackBox.classList.remove('hidden');
+        }
+
+        // NEXT QUESTION OR FINISH GAME
+        function nextQuestion() {
+            currentQIndex++;
+
+            if (currentQIndex < questionsData.length) {
+                loadQuestion();
+            } else {
+                showFinalResult();
+            }
+        }
+
+        // DISPLAY FINAL RESULT CARD
+        function showFinalResult() {
+            document.getElementById('quiz-container').classList.add('hidden');
+            const resultCard = document.getElementById('result-card');
+            resultCard.classList.remove('hidden');
+
+            document.getElementById('final-correct').innerText = `${scoreUser} / ${questionsData.length}`;
+            document.getElementById('final-score').innerText = `${scoreUser * 20}`;
+
+            const resultTitle = document.getElementById('result-title');
+            const resultDesc = document.getElementById('result-desc');
+            const resultEmoji = document.getElementById('result-emoji');
+
+            if (scoreUser > scoreBot) {
+                // USER WINS
+                playSound('win');
+                confetti({
+                    particleCount: 120,
+                    spread: 80,
+                    origin: { y: 0.6 }
+                });
+
+                resultEmoji.innerText = "🏆";
+                resultTitle.innerText = "KAMU MENANG!";
+                resultTitle.className = "text-2xl sm:text-4xl font-black font-game text-yellow-400 mb-2";
+                resultDesc.innerText = "Selamat! Tim Siswa berhasil mengalahkan Bot dalam pertandingan Tarik Tambang Statistika SMK!";
+            } else {
+                // BOT WINS OR TIE
+                resultEmoji.innerText = "🤖";
+                resultTitle.innerText = "BOT MENANG!";
+                resultTitle.className = "text-2xl sm:text-4xl font-black font-game text-red-400 mb-2";
+                resultDesc.innerText = "Jangan berkecil hati! Pelajari kembali materi Statistika dasar dan coba lagi untuk merebut kemenangan.";
+            }
+        }
+
+        // RESTART GAME
+        function restartGame() {
+            currentQIndex = 0;
+            scoreUser = 0;
+            scoreBot = 0;
+            ropePosition = 0;
+            targetRopePos = 0;
+
+            document.getElementById('score-user').innerText = '0';
+            document.getElementById('score-bot').innerText = '0';
+            document.getElementById('game-status-text').innerText = 'Jawab pertanyaan dengan benar untuk menarik tali ke kiri!';
+            document.getElementById('game-status-text').className = 'text-center text-xs sm:text-sm font-semibold text-slate-300 mt-2 h-5';
+
+            document.getElementById('result-card').classList.add('hidden');
+            document.getElementById('quiz-container').classList.remove('hidden');
+
+            loadQuestion();
+        }
+
+        // START ON WINDOW LOAD
+        window.onload = function() {
+            resizeCanvas();
+            drawScene();
+            loadQuestion();
+        };
+    </script>
+</body>
+</html>
