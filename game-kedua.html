@@ -1,0 +1,25 @@
+Bertindaklah sebagai Senior Game Developer dan Educational Game Designer yang ahli dalam membuat web game pembelajaran interaktif berbasis HTML5 Canvas dan JavaScript.
+
+Buatkan sebuah kode program lengkap (Single-file HTML yang mencakup HTML, CSS internal dengan Tailwind via CDN/Custom Styling, dan JavaScript murni / Canvas API) untuk sebuah web game edukasi individual (untuk 1 orang siswa) bergenre **Endless Runner** dengan topik materi: **Bentuk Akar** (Simplifikasi, Operasi Penjumlahan/Pengurangan, dan Perkalian Bentuk Akar).
+
+Berikut adalah spesifikasi game yang diinginkan:
+
+1. Konsep & Mekanik Game ("Endless Runner Math Challenge"):
+   - Karakter (misal: pahlawan mini atau objek bergerak ke depan) berlari secara otomatis di atas jalur/panggung (side-scrolling, 2D).
+   - Di sepanjang jalur, akan muncul rintangan atau gerbang pilihan ganda secara berkala (misal 3 jalur/pilihan atas, tengah, bawah).
+   - Contoh soal: Karakter harus menembus gerbang yang berisi jawaban benar dari bentuk akar yang ditampilkan di layar atas (Contoh soal: Bentuk sederhana dari $\sqrt{48}$? Pilihan di gerbang: $4\sqrt{3}$, $3\sqrt{4}$, $16\sqrt{3}$).
+   - Jika pemain memilih jalur gerbang yang benar, skor bertambah dan karakter melaju kencang. Jika salah, kecepatan berkurang atau nyawa (lives) berkurang.
+
+2. Fitur Utama & Tampilan (UI/UX):
+   - Desain visual yang bersih, ceria, dan responsif menggunakan Tailwind CSS untuk menu dan overlay, serta HTML5 Canvas untuk area permainan *endless runner*.
+   - Halaman Utama (Menu): Input nama siswa, tombol "Mulai Berlari", dan instruksi singkat cara bermain (menggunakan tombol panah atas/bawah atau swipe).
+   - Layar Permainan (Gameplay):
+     - Menampilkan Skor / Koin poin.
+     - Menampilkan Nyawa (Health/Lives) tersisa.
+     - Kotak Soal aktif di bagian atas layar.
+     - Kontrol yang responsif (Keyboard panah atas/bawah atau tombol sentuh di layar bagi pengguna mobile).
+   - Layar Akhir (Game Over): Menampilkan skor akhir, jumlah soal bentuk akar yang berhasil diselesaikan, pesan penyemangat (feedback edukatif), dan tombol "Mainkan Lagi".
+
+3. Kualitas & Struktur Kode:
+   - Berikan kode yang bersih, terstruktur, dan *fully functional* dalam satu blok kode HTML sehingga bisa langsung disalin, disimpan sebagai file dengan ekstensi `.html`, dan dijalankan di browser tanpa instalasi tambahan.
+   - Sertakan komentar yang jelas di bagian logika JavaScript (seperti loop permainan, deteksi tabrakan/collision, dan manajemen soal bentuk akar).
